@@ -1,6 +1,7 @@
-from selene import be, have, command
+from selene import have, command
 from selene import browser
 import paths
+from modules.users import User
 
 
 class RegistrationPage:
@@ -69,17 +70,34 @@ class RegistrationPage:
     def submit(self):
         browser.element('#submit').click()
 
-    def assert_user_submitted_form(self, name_and_lastname, email, gender, phone_number, date_of_birth,
-                                   subject, hobbies, image, address, state_and_city):
+    def assert_user_submitted_form(self, user: User):
         browser.element('#example-modal-sizes-title-lg').should(have.text('Thanks for submitting the form'))
         browser.element('.table').all('td').even.should(have.exact_texts(
-                f'{name_and_lastname}',
-                f'{email}',
-                f'{gender}',
-                f'{phone_number}',
-                f'{date_of_birth}',
-                f'{subject}',
-                f'{hobbies}',
-                f'{image}',
-                f'{address}',
-                f'{state_and_city}'))
+            f'{user.name} {user.last_name}',
+            f'{user.email}',
+            f'{user.gender}',
+            f'{user.phone}',
+            f'{user.day_of_birth} {user.month_of_birth},{user.year_of_birth}',
+            f'{user.subjects}',
+            f'{user.hobbies}',
+            f'{user.photo}',
+            f'{user.address}',
+            f'{user.state} {user.city}'
+        ))
+
+
+    def register(self, user: User):
+        self.open()
+        self.fill_first_name(user.name)
+        self.fill_last_name(user.last_name)
+        self.fill_email(user.email)
+        self.choose_gender()
+        self.fill_phone_number(user.phone)
+        self.fill_date_of_birth(user.year_of_birth, user.month_of_birth, user.day_of_birth)
+        self.fill_subjects(user.subjects)
+        self.fill_hobbies()
+        self.upload_picture(user.photo)
+        self.fill_address(user.address)
+        self.select_state(user.state)
+        self.select_city(user.city)
+        self.submit()

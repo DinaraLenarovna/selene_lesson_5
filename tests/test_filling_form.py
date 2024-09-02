@@ -1,30 +1,26 @@
-from selene import browser, be, have
-import os
+from modules.pages.registration_form_page import RegistrationPage
+from modules.users import User
 
 
-def test_filling_form():
-    browser.open('/automation-practice-form')
-    browser.element('#firstName').should(be.blank).type('Dinara')
-    browser.element('#lastName').should(be.blank).type('Safina')
-    browser.element('#userEmail').should(be.blank).type('dinatest@bk.ru')
-    browser.element('[for="gender-radio-2"]').click()
-    browser.element('#userNumber').should(be.blank).type('9999999999')
-    browser.element('#dateOfBirthInput').click()
-    browser.element('.react-datepicker__year-select').element('[value="1999"]').click()
-    browser.element('.react-datepicker__month-select').click()
-    browser.element('.react-datepicker__month-select').element('[value="3"]').click()
-    browser.element('.react-datepicker__day--011').click()
-    browser.element('#subjectsInput').should(be.blank).type('Maths').press_enter()
-    browser.element('[for="hobbies-checkbox-1"]').click()
-    browser.element('[for="hobbies-checkbox-2"]').click()
-    browser.element('#uploadPicture').send_keys(os.path.abspath('test_image.jpg'))
-    browser.element('#currentAddress').type('Russia, Ufa, Lenina St., 1')
-    browser.element('#react-select-3-input').type('Haryana').press_enter()
-    browser.element('#react-select-4-input').type('Panipat').press_enter()
-    browser.element('#submit').click()
+def test_student_registration_form():
+    form_action = RegistrationPage()
+    person = User(name='Dinara',
+                       last_name='Safina',
+                       email='dinatest@bk.ru',
+                       gender='Female',
+                       phone='7999991919',
+                       day_of_birth='11',
+                       month_of_birth='April',
+                       year_of_birth='1999',
+                       subjects='Maths',
+                       photo='test_image.jpg',
+                       hobbies='Sports, Reading',
+                       address='Russia, Ufa, Lenina St., 1',
+                       state='Haryana',
+                       city='Panipat')
 
-    browser.element('#example-modal-sizes-title-lg').should(have.text('Thanks for submitting the form'))
-    browser.element('.table').all('td').even.should(have.exact_texts(
-        'Dinara Safina', 'dinatest@bk.ru', 'Female', '9999999999', '11 April,1999', 'Maths', 'Sports, Reading',
-        'test_image.jpg', 'Russia, Ufa, Lenina St., 1', 'Haryana Panipat'
-    ))
+    form_action.open()
+    form_action.register(person)
+    form_action.assert_user_submitted_form(person)
+
+
